@@ -48,3 +48,38 @@ Hier erkläre ich, wie die Kompilierung von `sample.c` funktioniert, wie es in d
 - Awk verwende ich, wenn ich gezielt bestimmte Zeilen mit Zusatzinfos (z. B. Zeilennummern) rausfiltern will.
 - Vim interaktiv ist sinnvoll, wenn ich genau sehen möchte, was geändert wird – braucht aber mehr Zeit.
 - Vim über CLI ist praktisch für schnelle Ersetzungen, ohne die Oberfläche zu benutzen – gut, wenn ich genau weiß, was ich tue.
+
+
+
+
+# Task 3: Modular Linking with extern
+
+
+## Workflow
+
+1. **Erstelle `add.c`**:
+   - Hab `add.c` gemacht mit der Funktion `int add(int a, int b)`, die einfach `a + b` zurückgibt.
+
+2. **Erstelle `main.c`**:
+   - In `main.c` hab ich `extern int add(int, int);` deklariert, um die `add`-Funktion zu nutzen. Dann hab ich `add(5, 7)` aufgerufen und das Ergebnis mit `printf` ausgegeben.
+
+3. **Kompiliere separat**:
+   - Mit `gcc -c solutions/add.c -o solutions/add.o` hab ich `add.c` zu einer Objektdatei kompiliert.
+   - Mit `gcc -c solutions/main.c -o solutions/main.o` hab ich `main.c` kompiliert.
+
+4. **Linke manuell**:
+   - Mit `gcc solutions/add.o solutions/main.o -o solutions/add_example` hab ich die Objektdateien zu einem ausführbaren Programm `add_example` gelinkt.
+
+5. **Führe aus**:
+   - Mit `./solutions/add_example` hab ich das Programm gestartet, und es hat `5 + 7 = 12` ausgegeben.
+
+## Erklärungen
+
+- **Rolle von `extern`-Deklarationen**:
+  Die `extern`-Deklaration in `main.c` sagt dem Compiler, dass die Funktion `add` woanders definiert ist (in `add.c`). Ohne `extern` würde der Compiler meckern, weil er die Funktion nicht findet. Beim Linken wird dann die echte Funktion aus `add.o` eingebunden.
+
+- **Warum separate Kompilierung Builds beschleunigt**:
+  Wenn ich `add.c` und `main.c` separat kompiliere, muss ich nur die Datei neu kompilieren, die sich geändert hat. Zum Beispiel, wenn ich nur `main.c` ändere, kompiliere ich nur `main.c` zu `main.o` und linke dann mit dem alten `add.o`. Das spart Zeit bei großen Projekten mit vielen Dateien.
+
+- **Manuelles Linken vs. gcc in einem Schritt**:
+  Normalerweise macht `gcc main.c add.c -o add_example` alles auf einmal: kompilieren und linken. Beim manuellen Linken kompiliere ich erst zu Objektdateien (`add.o`, `main.o`) und linke sie dann selbst. Das gibt mehr Kontrolle, z. B. kann ich einzelne Objektdateien wiederverwenden oder mit anderen Programmen linken. Aber es ist mehr Aufwand, weil ich mehrere Befehle eingeben muss.
